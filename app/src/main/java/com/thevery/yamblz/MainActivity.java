@@ -2,6 +2,7 @@ package com.thevery.yamblz;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -18,6 +19,10 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import rx.Observable;
+import rx.Single;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,6 +52,28 @@ public class MainActivity extends AppCompatActivity {
 
         translateApi = retrofit.create(YandexTranslateApi.class);
         textView = (TextView) findViewById(R.id.tv);
+
+
+
+        Single.just(1);
+
+        Observable
+                .just(1)
+                .filter(integer -> {
+                    System.out.println("[filter] isMain = " + isMain());
+                    return integer / 10 == 0;
+                })
+                .subscribeOn(Schedulers.io())
+                .map(integer -> integer * integer)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(integer -> {
+                    System.out.println("[subscribe] isMain = " + isMain());
+                    System.out.println("integer = " + integer);
+                });
+    }
+
+    private boolean isMain() {
+        return Looper.getMainLooper() == Looper.myLooper();
     }
 
     public void translate(View view) {
@@ -60,24 +87,30 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     private void startTranslation(@NonNull final String source) {
-        new AsyncTask<String, Void, String>() {
+        Single.fromCallable(() -> getResult(source))
+                .map(String::toUpperCase)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(it -> textView.setText(it));
 
-            @Override
-            protected String doInBackground(String... strings) {
-                final Response<YandexTranslateResponse> response;
-                try {
-                    return getResult(source);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return "fail :(";
-                }
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                textView.setText(s);
-            }
-        }.execute(source);
+//        new AsyncTask<String, Void, String>() {
+//
+//            @Override
+//            protected String doInBackground(String... strings) {
+//                final Response<YandexTranslateResponse> response;
+//                try {
+//                    return getResult(source);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    return "fail :(";
+//                }
+//            }
+//
+//            @Override
+//            protected void onPostExecute(String s) {
+//                textView.setText(s);
+//            }
+//        }.execute(source);
     }
 
     private String getResult(@NonNull String source) throws IOException {
