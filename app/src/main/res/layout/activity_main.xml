@@ -13,11 +13,13 @@
         android:layout_height="wrap_content">
 
         <EditText
+            android:id="@+id/et"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hello World!" />
 
         <Button
+            android:onClick="translate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="go" />
@@ -26,6 +28,7 @@
 
 
     <TextView
+        android:id="@+id/tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
