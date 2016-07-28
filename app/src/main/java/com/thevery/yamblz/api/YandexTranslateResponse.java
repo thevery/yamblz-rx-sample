@@ -13,7 +13,7 @@ package com.thevery.yamblz.api;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class YandexTranslateReponse {
+public class YandexTranslateResponse {
     public int code;
     public String lang;
     public String[] text;

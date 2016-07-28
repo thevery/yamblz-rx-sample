@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.thevery.yamblz.api.YandexTranslateApi;
-import com.thevery.yamblz.api.YandexTranslateReponse;
+import com.thevery.yamblz.api.YandexTranslateResponse;
 
 import java.io.IOException;
 
@@ -17,13 +17,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,12 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected String doInBackground(String... strings) {
-                final Response<YandexTranslateReponse> response;
+                final Response<YandexTranslateResponse> response;
                 try {
-                    response = translateApi
-                            .translateCall(YandexTranslateApi.YANDEX_API_KEY, source, "ru")
-                            .execute();
-                    return response.body().text[0];
+                    return getResult(source);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return "fail :(";
@@ -87,5 +78,13 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText(s);
             }
         }.execute(source);
+    }
+
+    private String getResult(@NonNull String source) throws IOException {
+        Response<YandexTranslateResponse> response;
+        response = translateApi
+                .translateCall(YandexTranslateApi.YANDEX_API_KEY, source, "ru")
+                .execute();
+        return response.body().text[0];
     }
 }
