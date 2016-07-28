@@ -28,4 +28,4 @@
 # Retain declared checked exceptions for use by a Proxy instance.
 -keepattributes Exceptions
 
-# +jackson, rxjava, rxandroid, butterknife
+# +jackson, rxjava, rxandroid, butterknife, okhttp
