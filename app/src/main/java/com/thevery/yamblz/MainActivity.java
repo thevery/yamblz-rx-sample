@@ -21,8 +21,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import rx.Observable;
 import rx.Single;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 import static rx.schedulers.Schedulers.io;
@@ -31,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     private YandexTranslateApi translateApi;
     private TextView textView;
+
+    CompositeSubscription compositeSubscription = new CompositeSubscription();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
         translateApi = retrofit.create(YandexTranslateApi.class);
         textView = (TextView) findViewById(R.id.tv);
-
 
 
         Single.just(1);
@@ -84,20 +87,28 @@ public class MainActivity extends AppCompatActivity {
         startTranslation(text);
     }
 
-//    @NonNull
+    @Override
+    protected void onPause() {
+        super.onPause();
+        compositeSubscription.clear();
+    }
+
+    //    @NonNull
 //    private String translate(@NonNull String source) {
 //        return translateApi.translate(YandexTranslateApi.YANDEX_API_KEY, source, "ru").toBlocking().value().text[0];
 //    }
 
     private void startTranslation(@NonNull final String source) {
-        Single.fromCallable(() -> getResult(source))
+        Subscription subscription = Single.fromCallable(() -> getResult(source))
                 .map(String::toUpperCase)
                 .subscribeOn(io())
                 .observeOn(mainThread())
                 .subscribe(
-                        it -> textView.setText(it),
-                        error -> error.printStackTrace()
+                        translation -> textView.setText(translation),
+                        error -> textView.setText(error.toString())
                 );
+
+        compositeSubscription.add(subscription);
 
 //        new AsyncTask<String, Void, String>() {
 //
