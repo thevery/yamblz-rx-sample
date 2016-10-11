@@ -24,6 +24,9 @@ import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static rx.android.schedulers.AndroidSchedulers.mainThread;
+import static rx.schedulers.Schedulers.io;
+
 public class MainActivity extends AppCompatActivity {
 
     private YandexTranslateApi translateApi;
@@ -63,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println("[filter] isMain = " + isMain());
                     return integer / 10 == 0;
                 })
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(io())
                 .map(integer -> integer * integer)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(mainThread())
                 .subscribe(integer -> {
                     System.out.println("[subscribe] isMain = " + isMain());
                     System.out.println("integer = " + integer);
@@ -89,9 +92,12 @@ public class MainActivity extends AppCompatActivity {
     private void startTranslation(@NonNull final String source) {
         Single.fromCallable(() -> getResult(source))
                 .map(String::toUpperCase)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(it -> textView.setText(it));
+                .subscribeOn(io())
+                .observeOn(mainThread())
+                .subscribe(
+                        it -> textView.setText(it),
+                        error -> error.printStackTrace()
+                );
 
 //        new AsyncTask<String, Void, String>() {
 //
