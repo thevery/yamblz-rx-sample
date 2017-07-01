@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -25,10 +24,14 @@ android {
         warningsAsErrors true
         abortOnError false // todo: change to true
     }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
 
     // okhttp
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
@@ -47,7 +50,7 @@ dependencies {
 
     // butterknife
     compile 'com.jakewharton:butterknife:8.2.1'
-    apt 'com.jakewharton:butterknife-compiler:8.2.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.2.1'
 }
 
 def getBuildNumber() {
