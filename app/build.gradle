@@ -1,16 +1,19 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
     defaultConfig {
         applicationId "com.thevery.yamblz"
-        minSdkVersion 15
-        targetSdkVersion 24
-        versionCode 1
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode getBuildNumber()
         versionName "1.0"
+
+        // makes build slower :(
+        buildConfigField 'long', 'BUILD_DATE', "${System.currentTimeMillis()}L"
     }
     buildTypes {
         release {
@@ -32,10 +35,15 @@ android {
         exclude 'META-INF/LICENSE.txt'
     }
 
+
+    lintOptions {
+        warningsAsErrors true
+        abortOnError false // todo: change to true
+    }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
 
     // okhttp
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
@@ -54,5 +62,9 @@ dependencies {
 
     // butterknife
     compile 'com.jakewharton:butterknife:8.2.1'
-    apt 'com.jakewharton:butterknife-compiler:8.2.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.2.1'
+}
+
+def getBuildNumber() {
+    (System.getenv('BUILD_NUMBER') ?: Integer.MAX_VALUE) as int
 }
